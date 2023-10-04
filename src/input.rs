@@ -128,6 +128,10 @@ pub fn is_key_down(key_code: KeyCode) -> bool {
     context.keys_down.contains(&key_code)
 }
 
+pub fn keys_down() -> impl Iterator<Item = KeyCode> {
+    get_context().keys_down.iter().copied()
+}
+
 /// Detect if the key has been released this frame
 pub fn is_key_released(key_code: KeyCode) -> bool {
     let context = get_context();
@@ -223,5 +227,11 @@ pub mod utils {
             event.repeat(t);
         }
         context.input_events[subscriber].clear();
+    }
+
+    /// Repeats all events that came since last call of this function with current value of `subscriber`. This function must be called at each frame.
+    pub fn drain_events(subscriber: usize) -> std::vec::Drain<'static, crate::MiniquadInputEvent> {
+        let context = get_context();
+        context.input_events[subscriber].drain(..)
     }
 }

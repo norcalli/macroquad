@@ -59,15 +59,19 @@ impl Font {
         })
     }
 
-    pub(crate) fn ascent(&self, font_size: f32) -> f32 {
+    pub fn ascent(&self, font_size: f32) -> f32 {
         self.font.horizontal_line_metrics(font_size).unwrap().ascent
     }
 
-    pub(crate) fn descent(&self, font_size: f32) -> f32 {
+    pub fn descent(&self, font_size: f32) -> f32 {
         self.font
             .horizontal_line_metrics(font_size)
             .unwrap()
             .descent
+    }
+
+    pub fn fontdue(&self) -> &fontdue::Font {
+        &self.font
     }
 
     pub(crate) fn cache_glyph(&self, character: char, size: u16) {
@@ -125,7 +129,7 @@ impl Font {
             .cloned()
     }
 
-    pub(crate) fn measure_text(
+    pub fn measure_text(
         &self,
         text: &str,
         font_size: u16,
@@ -297,9 +301,7 @@ pub fn draw_text(text: &str, x: f32, y: f32, font_size: f32, color: Color) {
 
 /// Draw text with custom params such as font, font size and font scale.
 pub fn draw_text_ex(text: &str, x: f32, y: f32, params: TextParams) {
-    let font = params
-        .font
-        .unwrap_or(&get_context().fonts_storage.default_font);
+    let font = params.font.unwrap_or(default_font());
 
     let font_scale_x = params.font_scale * params.font_scale_aspect;
     let font_scale_y = params.font_scale;
@@ -360,6 +362,10 @@ pub fn draw_text_ex(text: &str, x: f32, y: f32, params: TextParams) {
             },
         );
     }
+}
+
+pub fn default_font() -> &'static Font {
+    &get_context().fonts_storage.default_font
 }
 
 /// Get the text center.

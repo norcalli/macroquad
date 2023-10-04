@@ -230,8 +230,8 @@ struct Context {
     textures: crate::texture::TexturesContext,
 }
 
-#[derive(Clone)]
-enum MiniquadInputEvent {
+#[derive(Clone, Debug)]
+pub enum MiniquadInputEvent {
     MouseMotion {
         x: f32,
         y: f32,
