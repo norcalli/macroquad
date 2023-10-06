@@ -711,15 +711,15 @@ impl EventHandler for Stage {
             get_context().frame_time = date::now() - get_context().last_frame_time;
             get_context().last_frame_time = date::now();
 
-            #[cfg(any(target_arch = "wasm32", target_os = "linux"))]
-            {
-                let _z = telemetry::ZoneGuard::new("glFinish/glFLush");
+            // #[cfg(any(target_arch = "wasm32", target_os = "linux"))]
+            // {
+            //     let _z = telemetry::ZoneGuard::new("glFinish/glFLush");
 
-                unsafe {
-                    miniquad::gl::glFlush();
-                    miniquad::gl::glFinish();
-                }
-            }
+            //     unsafe {
+            //         miniquad::gl::glFlush();
+            //         miniquad::gl::glFinish();
+            //     }
+            // }
         }
 
         telemetry::reset();
