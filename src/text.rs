@@ -98,7 +98,7 @@ impl Font {
             Image {
                 bytes: bitmap
                     .iter()
-                    .flat_map(|coverage| vec![255, 255, 255, *coverage])
+                    .flat_map(|coverage| [255, 255, 255, *coverage])
                     .collect(),
                 width,
                 height,
@@ -139,37 +139,24 @@ impl Font {
         let dpi_scaling = miniquad::window::dpi_scale();
         let font_size = (font_size as f32 * dpi_scaling).ceil() as u16;
 
-        for character in text.chars() {
-            if self
-                .characters
-                .lock()
-                .unwrap()
-                .contains_key(&(character, font_size))
-                == false
-            {
-                self.cache_glyph(character, font_size);
-            }
-        }
-
         let mut width = 0.;
         let mut min_y = std::f32::MAX;
         let mut max_y = -std::f32::MAX;
 
-        let atlas = self.atlas.lock().unwrap();
-
         for character in text.chars() {
-            if let Some(font_data) = self.characters.lock().unwrap().get(&(character, font_size)) {
-                let glyph = atlas.get(font_data.sprite).unwrap().rect;
-                width += font_data.advance * font_scale_x;
+            let metrics = self.font.metrics(character, font_size as f32);
+            let advance = metrics.advance_width;
 
-                if min_y > font_data.offset_y as f32 * font_scale_y {
-                    min_y = font_data.offset_y as f32 * font_scale_y;
-                }
-                if max_y < glyph.h as f32 * font_scale_y + font_data.offset_y as f32 * font_scale_y
-                {
-                    max_y =
-                        glyph.h as f32 * font_scale_y + font_data.offset_y as f32 * font_scale_y;
-                }
+            let (offset_x, offset_y) = (metrics.xmin, metrics.ymin);
+
+            let glyph_height = metrics.height;
+            width += advance * font_scale_x;
+
+            if min_y > offset_y as f32 * font_scale_y {
+                min_y = offset_y as f32 * font_scale_y;
+            }
+            if max_y < glyph_height as f32 * font_scale_y + offset_y as f32 * font_scale_y {
+                max_y = glyph_height as f32 * font_scale_y + offset_y as f32 * font_scale_y;
             }
         }
 
